@@ -47,6 +47,8 @@ void mkdir(char pathName[]){
     
     //printf("newDir %s \n", baseName);
     strcpy(newDir->name, baseName);
+
+    free(baseName);
     //printf("newDir %s \n", newDir->name);
 
     newDir->parentPtr = head;
