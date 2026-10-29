@@ -16,8 +16,9 @@ struct NODE* getChild(struct NODE* parent, char* childName);
 //make directory
 void mkdir(char pathName[]){
 
-    if (strcmp(pathName, "/")==0){
+    if (strcmp(pathName, "/")==0 || pathName[0]=='\0'){
         printf("MKDIR ERROR: no path provided\n");
+        return;
     }
 
     char* baseName = malloc(sizeof(char)*64);
@@ -28,12 +29,12 @@ void mkdir(char pathName[]){
     struct NODE* head = splitPath(pathName, baseName, temp);
     free(temp);
 
-    //printf("head: %p\n", head);
-    //printf("head %p\n", head);
-
+  
     if (head==NULL){
         return;
     }
+
+
 
     if (getChild(head, baseName)!=NULL){
         printf("MKDIR ERROR: directory %s already exists\n", pathName);
@@ -50,6 +51,9 @@ void mkdir(char pathName[]){
 
     newDir->parentPtr = head;
     newDir->fileType='D';
+    newDir->siblingPtr=NULL;
+    newDir->childPtr=NULL;
+    
 
     if (head->childPtr==NULL){
         head->childPtr=newDir;
@@ -58,6 +62,8 @@ void mkdir(char pathName[]){
     head=head->childPtr;
 
     while (1){
+        //printf("head: %p\n", head);
+        //printf("headName: %s\n", head->name);
         if (head->siblingPtr==NULL){
             head->siblingPtr=newDir;
             return;
@@ -165,7 +171,12 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
 
         //printf("directory %p\n", currentLocation);
         if (currentLocation==NULL){
-            printf("ERROR: directory %s does not exist\n", dirName);
+            if(strlen(dirName)!=0){
+                printf("ERROR: directory %s/%s does not exist\n", dirName, token);
+            }
+            else{
+                printf("ERROR: directory %s does not exist\n", token);
+            }
             return NULL;
         }
 
@@ -196,10 +207,11 @@ struct NODE* splitPath(char* pathName, char* baseName, char* dirName){
 struct NODE* getChild(struct NODE* parent, char* childName){
     struct NODE* current = parent->childPtr;
     while(current!=NULL){
+        //printf("name: %s : %p \n", current->name, current->childPtr);
         if (strcmp(current->name, childName)==0){
             return current;
         }
-        current=current->childPtr;
+        current=current->siblingPtr;
     }
     return NULL;
 
